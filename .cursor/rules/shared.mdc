@@ -3,9 +3,9 @@ description:
 globs: 
 alwaysApply: true
 ---
-# AI Rules for {app-name}
+# AI Rules for Smile
 
-{project-description}
+SMile to aplikacja webowa zaprojektowana w celu wsparcia pacjentów chorych na stwardnienie rozsiane (SM) poprzez umożliwienie im codziennego monitorowania kluczowych wskaźników zdrowotnych. Aplikacja skupia się na prostocie i użyteczności, pozwalając na rejestrowanie wagi, ciśnienia krwi oraz objawów neurologicznych. Dane są prezentowane w formie przejrzystych wykresów, co ułatwia śledzenie postępów i trendów w czasie. Projekt jest realizowany w architekturze online-only, z wykorzystaniem Supabase jako backendu do autentykacji i przechowywania danych. Aplikacja jest optymalizowana pod kątem przeglądarki Chrome na urządzeniach mobilnych.
 
 ## Tech Stack
 
