@@ -171,11 +171,50 @@ All endpoints are prefixed with `/api`. All endpoints require authentication unl
 ### Blood Pressure Resource
 
 -   **Path**: `/blood-pressure`
--   **Description**: Manages the user's blood pressure records. Endpoints follow the same CRUD pattern as the Weight resource (`GET /`, `POST /`, `PUT /{id}`, `DELETE /{id}`).
+-   **Description**: Manages the user's blood pressure records.
 
 ---
 
-#### Create Blood Pressure Record (Example)
+#### Get All Blood Pressure Records
+
+-   **Method**: `GET`
+-   **Path**: `/blood-pressure`
+-   **Description**: Retrieves a list of all blood pressure records for the authenticated user, sorted by date descending.
+-   **Query Parameters**:
+    -   `page` (number, optional, default: 1): The page number for pagination.
+    -   `pageSize` (number, optional, default: 30): The number of records per page.
+-   **Response Payload**:
+    ```json
+    {
+      "data": [
+        {
+          "id": 201,
+          "date": "2025-10-16",
+          "systolic": 120,
+          "diastolic": 80,
+          "pulse": 60
+        },
+        {
+          "id": 200,
+          "date": "2025-10-15",
+          "systolic": 122,
+          "diastolic": 81,
+          "pulse": 65
+        }
+      ],
+      "pagination": {
+        "page": 1,
+        "pageSize": 30,
+        "total": 2
+      }
+    }
+    ```
+-   **Success Response**: `200 OK`
+-   **Error Responses**: `401 Unauthorized`
+
+---
+
+#### Create Blood Pressure Record
 
 -   **Method**: `POST`
 -   **Path**: `/blood-pressure`
@@ -189,16 +228,7 @@ All endpoints are prefixed with `/api`. All endpoints require authentication unl
       "pulse": 60
     }
     ```
--   **Response Payload**:
-    ```json
-    {
-      "id": 201,
-      "date": "2025-10-16",
-      "systolic": 120,
-      "diastolic": 80,
-      "pulse": 60
-    }
-    ```
+-   **Response Payload**: The newly created blood pressure record object.
 -   **Success Response**: `201 Created`
 -   **Error Responses**:
     -   `400 Bad Request`: Validation error.
@@ -206,14 +236,92 @@ All endpoints are prefixed with `/api`. All endpoints require authentication unl
 
 ---
 
-### Symptom Resource
+#### Update Blood Pressure Record
 
--   **Path**: `/symptoms`
--   **Description**: Manages the user's symptom records. Endpoints follow the same CRUD pattern as the Weight resource (`GET /`, `POST /`, `PUT /{id}`, `DELETE /{id}`).
+-   **Method**: `PUT`
+-   **Path**: `/blood-pressure/{id}`
+-   **Description**: Updates an existing blood pressure record.
+-   **Request Payload**:
+    ```json
+    {
+      "date": "2025-10-16",
+      "systolic": 118,
+      "diastolic": 78,
+      "pulse": 58
+    }
+    ```
+-   **Response Payload**: The updated blood pressure record object.
+-   **Success Response**: `200 OK`
+-   **Error Responses**:
+    -   `400 Bad Request`: Validation error.
+    -   `401 Unauthorized`: User is not authenticated.
+    -   `403 Forbidden`: User is trying to update a record they do not own.
+    -   `404 Not Found`: Record with the given ID does not exist.
 
 ---
 
-#### Create Symptom Record (Example)
+#### Delete Blood Pressure Record
+
+-   **Method**: `DELETE`
+-   **Path**: `/blood-pressure/{id}`
+-   **Description**: Deletes a blood pressure record.
+-   **Request Payload**: None
+-   **Response Payload**: None
+-   **Success Response**: `204 No Content`
+-   **Error Responses**:
+    -   `401 Unauthorized`: User is not authenticated.
+    -   `403 Forbidden`: User is trying to delete a record they do not own.
+    -   `404 Not Found`: Record with the given ID does not exist.
+
+---
+
+### Symptom Resource
+
+-   **Path**: `/symptoms`
+-   **Description**: Manages the user's symptom records.
+
+---
+
+#### Get All Symptom Records
+
+-   **Method**: `GET`
+-   **Path**: `/symptoms`
+-   **Description**: Retrieves a list of all symptom records for the authenticated user, sorted by date descending.
+-   **Query Parameters**:
+    -   `page` (number, optional, default: 1): The page number for pagination.
+    -   `pageSize` (number, optional, default: 30): The number of records per page.
+-   **Response Payload**:
+    ```json
+    {
+      "data": [
+        {
+          "id": 301,
+          "date": "2025-10-16",
+          "body_part": "LeftHand",
+          "pain_type": "Numbness",
+          "description": "Fingers feel numb after waking up."
+        },
+        {
+          "id": 300,
+          "date": "2025-10-15",
+          "body_part": "RightFoot",
+          "pain_type": "Tingling",
+          "description": "Tingling sensation in the toes."
+        }
+      ],
+      "pagination": {
+        "page": 1,
+        "pageSize": 30,
+        "total": 2
+      }
+    }
+    ```
+-   **Success Response**: `200 OK`
+-   **Error Responses**: `401 Unauthorized`
+
+---
+
+#### Create Symptom Record
 
 -   **Method**: `POST`
 -   **Path**: `/symptoms`
@@ -227,20 +335,50 @@ All endpoints are prefixed with `/api`. All endpoints require authentication unl
       "description": "Fingers feel numb after waking up."
     }
     ```
--   **Response Payload**:
-    ```json
-    {
-      "id": 301,
-      "date": "2025-10-16",
-      "body_part": "LeftHand",
-      "pain_type": "Numbness",
-      "description": "Fingers feel numb after waking up."
-    }
-    ```
+-   **Response Payload**: The newly created symptom record object.
 -   **Success Response**: `201 Created`
 -   **Error Responses**:
     -   `400 Bad Request`: Validation error (e.g., invalid enum value).
     -   `401 Unauthorized`: User is not authenticated.
+
+---
+
+#### Update Symptom Record
+
+-   **Method**: `PUT`
+-   **Path**: `/symptoms/{id}`
+-   **Description**: Updates an existing symptom record.
+-   **Request Payload**:
+    ```json
+    {
+      "date": "2025-10-16",
+      "body_part": "LeftHand",
+      "pain_type": "Numbness",
+      "description": "Fingers feel very numb."
+    }
+    ```
+-   **Response Payload**: The updated symptom record object.
+-   **Success Response**: `200 OK`
+-   **Error Responses**:
+    -   `400 Bad Request`: Validation error.
+    -   `401 Unauthorized`: User is not authenticated.
+    -   `403 Forbidden`: User is trying to update a record they do not own.
+    -   `404 Not Found`: Record with the given ID does not exist.
+
+---
+
+#### Delete Symptom Record
+
+-   **Method**: `DELETE`
+-   **Path**: `/symptoms/{id}`
+-   **Description**: Deletes a symptom record.
+-   **Request Payload**: None
+-   **Response Payload**: None
+-   **Success Response**: `204 No Content`
+-   **Error Responses**:
+    -   `401 Unauthorized`: User is not authenticated.
+    -   `403 Forbidden`: User is trying to delete a record they do not own.
+    -   `404 Not Found`: Record with the given ID does not exist.
 
 ---
 
