@@ -1,0 +1,12 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import RegisterForm from "@/components/auth/RegisterForm.tsx";
+---
+
+<Layout title="Zarejestruj się | SMile">
+	<main class="container mx-auto flex-grow p-4">
+		<div class="flex min-h-full flex-col items-center justify-center">
+			<RegisterForm client:load />
+		</div>
+	</main>
+</Layout>
