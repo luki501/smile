@@ -54,6 +54,15 @@ export type UpdateUserProfileCommand = Pick<
 >;
 
 /**
+ * Command model for creating a user's profile.
+ * Represents the request body for `POST /api/users/me`.
+ */
+export type CreateUserProfileCommand = Pick<
+	TablesInsert<"users">,
+	"first_name" | "last_name" | "date_of_birth" | "height_cm"
+>;
+
+/**
  * =================================================================================
  * WEIGHT RECORDS
  * =================================================================================

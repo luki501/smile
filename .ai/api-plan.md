@@ -47,6 +47,29 @@ All endpoints are prefixed with `/api`. All endpoints require authentication unl
 
 ---
 
+#### Create User Profile
+
+-   **Method**: `POST`
+-   **Path**: `/users/me`
+-   **Description**: Creates a profile for the currently authenticated user. This endpoint should only be called once per user, typically during onboarding.
+-   **Request Payload**:
+    ```json
+    {
+      "first_name": "John",
+      "last_name": "Doe",
+      "date_of_birth": "1990-01-15",
+      "height_cm": 180
+    }
+    ```
+-   **Response Payload**: The newly created User Profile object.
+-   **Success Response**: `201 Created`
+-   **Error Responses**:
+    -   `400 Bad Request`: Validation error (e.g., invalid date format, non-numeric height).
+    -   `401 Unauthorized`: User is not authenticated.
+    -   `409 Conflict`: A profile for this user already exists.
+
+---
+
 #### Update User Profile
 
 -   **Method**: `PUT`

@@ -1,6 +1,7 @@
 import type { APIContext, APIRoute } from "astro";
-import { getUserProfile, updateUserProfile } from "@/lib/services/userService";
-import { updateUserProfileSchema } from "@/lib/validators/userValidators";
+import { createUserProfile, getUserProfile, updateUserProfile } from "@/lib/services/userService";
+import { createUserProfileSchema, updateUserProfileSchema } from "@/lib/validators/userValidators";
+import { ConflictError } from "@/lib/errors";
 
 export const prerender = false;
 
@@ -42,6 +43,58 @@ export async function GET({ locals }: APIContext): Promise<Response> {
 		});
 	}
 }
+
+/**
+ * Handles POST requests to create a new user profile.
+ *
+ * @param {APIContext} context - The Astro API context.
+ * @returns {Promise<Response>} A promise that resolves to a Response object.
+ */
+export const POST: APIRoute = async ({ request, locals }) => {
+	const { user, supabase } = locals;
+
+	if (!user) {
+		return new Response(null, { status: 401 });
+	}
+
+	try {
+		const body = await request.json();
+		const validation = createUserProfileSchema.safeParse(body);
+
+		if (!validation.success) {
+			return new Response(
+				JSON.stringify({
+					message: "Validation failed",
+					errors: validation.error.flatten().fieldErrors,
+				}),
+				{
+					status: 400,
+					headers: { "Content-Type": "application/json" },
+				},
+			);
+		}
+
+		const newUserProfile = await createUserProfile(supabase, user.id, validation.data);
+
+		return new Response(JSON.stringify(newUserProfile), {
+			status: 201,
+			headers: { "Content-Type": "application/json" },
+		});
+	} catch (error) {
+		if (error instanceof ConflictError) {
+			return new Response(JSON.stringify({ message: error.message }), {
+				status: 409,
+				headers: { "Content-Type": "application/json" },
+			});
+		}
+
+		console.error("Error in POST /api/users/me:", error);
+		return new Response(JSON.stringify({ message: "Internal Server Error" }), {
+			status: 500,
+			headers: { "Content-Type": "application/json" },
+		});
+	}
+};
 
 export const PUT: APIRoute = async ({ request, locals }) => {
 	const { user, supabase } = locals;

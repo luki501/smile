@@ -1,5 +1,10 @@
 import type { SupabaseClient } from "@/db/supabase.client";
-import type { UpdateUserProfileCommand, UserProfileDto } from "@/types";
+import type {
+	CreateUserProfileCommand,
+	UpdateUserProfileCommand,
+	UserProfileDto,
+} from "@/types";
+import { ConflictError } from "../errors";
 
 /**
  * Retrieves the public profile for a given user.
@@ -66,4 +71,51 @@ export async function updateUserProfile(
 	}
 
 	return updatedUser;
+}
+
+/**
+ * Creates a new user profile.
+ *
+ * @param supabase - The Supabase client instance.
+ * @param userId - The ID of the user for whom to create the profile.
+ * @param command - An object containing the profile data.
+ * @returns A promise that resolves to the newly created user's profile DTO.
+ * @throws {ConflictError} If a profile for the user already exists.
+ * @throws {Error} If a database error occurs.
+ */
+export async function createUserProfile(
+	supabase: SupabaseClient,
+	userId: string,
+	command: CreateUserProfileCommand,
+): Promise<UserProfileDto> {
+	const { data: existingProfile, error: selectError } = await supabase
+		.from("users")
+		.select("id")
+		.eq("id", userId)
+		.maybeSingle();
+
+	if (selectError) {
+		console.error("Error checking for existing user profile:", selectError);
+		throw new Error("A database error occurred while checking for an existing profile.");
+	}
+
+	if (existingProfile) {
+		throw new ConflictError("User profile already exists.");
+	}
+
+	const { data: newUserProfile, error: insertError } = await supabase
+		.from("users")
+		.insert({
+			id: userId,
+			...command,
+		})
+		.select("id, first_name, last_name, date_of_birth, height_cm, updated_at")
+		.single();
+
+	if (insertError) {
+		console.error("Error creating user profile:", insertError);
+		throw new Error("A database error occurred while creating the user profile.");
+	}
+
+	return newUserProfile;
 }
