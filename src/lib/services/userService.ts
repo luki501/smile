@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@/db/supabase.client";
-import type { UserProfileDto } from "@/types";
+import type { UpdateUserProfileCommand, UserProfileDto } from "@/types";
 
 /**
  * Retrieves the public profile for a given user.
@@ -31,4 +31,39 @@ export async function getUserProfile(
 	}
 
 	return data;
+}
+
+/**
+ * Updates a user's profile with the provided data.
+ *
+ * @param supabase - The Supabase client instance.
+ * @param userId - The ID of the user whose profile is to be updated.
+ * @param command - An object containing the profile fields to update.
+ * @returns A promise that resolves to the updated user's profile DTO.
+ * @throws Will throw an error if the update fails or the user is not found.
+ */
+export async function updateUserProfile(
+	supabase: SupabaseClient,
+	userId: string,
+	command: UpdateUserProfileCommand,
+): Promise<UserProfileDto> {
+	const { data: updatedUser, error } = await supabase
+		.from("users")
+		.update(command)
+		.eq("id", userId)
+		.select("id, first_name, last_name, date_of_birth, height_cm, updated_at")
+		.single();
+
+	if (error) {
+		console.error("Error updating user profile:", error);
+		throw new Error("A database error occurred while updating the user profile.");
+	}
+
+	if (!updatedUser) {
+		// This case should ideally not be reached if the user is authenticated
+		// and the user ID from the session is valid.
+		throw new Error("User not found after update operation.");
+	}
+
+	return updatedUser;
 }
